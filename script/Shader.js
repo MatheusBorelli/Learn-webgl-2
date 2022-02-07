@@ -5,8 +5,8 @@ import {readFileText} from "./Utils/readFileText.js"
 export default class Shader{
     constructor(gl , ShaderSource, cacheSize){
         
-        const vertShader = compileShader(gl, gl.VERTEX_SHADER  , readFileText(ShaderSource[0]));
-        const fragShader = compileShader(gl, gl.FRAGMENT_SHADER, readFileText(ShaderSource[1]));
+        const vertShader = compileShader(gl, gl.VERTEX_SHADER  , ShaderSource[0]);
+        const fragShader = compileShader(gl, gl.FRAGMENT_SHADER, ShaderSource[1]);
         
         this.rendererID = createProgram(gl , vertShader , fragShader),
         this.cacheLocation  = new HashTable(cacheSize)

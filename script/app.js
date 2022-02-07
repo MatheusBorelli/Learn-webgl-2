@@ -12,7 +12,33 @@ gl.enable(gl.BLEND);
 gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
 //Compile and Shader Stuff
-const shaderSource = ["./assets/shaders/VertexShader.glsl","./assets/shaders/FragmentShader.glsl"]
+const vertexShader = `#version 300 es
+
+in vec2 a_position;
+
+uniform vec2 u_resolution;
+uniform mat3 u_matrix;
+
+void main() { 
+    vec2 position = (u_matrix * vec3(a_position, 1)).xy;
+
+    vec2 resolutionGrid = position / u_resolution;
+    resolutionGrid *= 2.0;
+    resolutionGrid -= 1.0;
+
+    gl_Position = vec4( resolutionGrid , 0 , 1);
+}`;
+const fragmentShader = `#version 300 es
+ 
+precision highp float;
+ 
+out vec4 outColor;
+ 
+void main() {
+    outColor = vec4(1, 0, 0, 1);
+}`;
+
+const shaderSource = [vertexShader,fragmentShader];
 
 const shader = new Shader(gl , shaderSource , 10);
 
@@ -106,7 +132,6 @@ function draw(){
 
         gl.drawArrays(primitiveType, 0 , count)
     }
-    console.log(matrix)
     //console.log(fps);
     //requestAnimationFrame(draw);
 }
