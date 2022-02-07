@@ -1,7 +1,7 @@
 import Shader from "./Shader.js";
 import VertexBuffer from "./VertexBuffer.js";
-import { resizeDisplay , GetFPS } from "./WebglUtils/WebglUtils.js";
 import Matrix3 from "./Utils/Matrix3.js";
+import { resizeDisplay , GetFPS } from "./WebglUtils/WebglUtils.js";
 
 const canvas = document.querySelector("#Canvas")
 const gl = canvas.getContext("webgl2")
@@ -38,8 +38,8 @@ void main() {
     outColor = vec4(1, 0, 0, 1);
 }`;
 
-const shaderSource = [vertexShader,fragmentShader];
-
+//const shaderSource = [vertexShader,fragmentShader];
+const shaderSource = ["./assets/shaders/VertexShader.glsl","./assets/shaders/FragmentShader.glsl"]
 const shader = new Shader(gl , shaderSource , 10);
 
 // Buffer Stuff
@@ -91,7 +91,6 @@ let rotation = [Math.sin(angle) , Math.cos(angle)];
 let scale = [0.85 , 0.85];
 
 let then = 0;
-
 let translationMatrix = Matrix3().translation( positionObject[0] , positionObject[1] );
 let rotationMatrix    = Matrix3().rotation( rotation[0] , rotation[1] );
 let scaleMatrix       = Matrix3().scaling( scale[0] , scale[1] );
