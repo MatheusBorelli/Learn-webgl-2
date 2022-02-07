@@ -1,6 +1,5 @@
 //import HashTable from "./Utils/HashTable.js"
 import HashTable from "./Utils/HashTable.js"
-import {readFileText} from "./Utils/readFileText.js"
 
 export default class Shader{
     constructor(gl , ShaderSource, cacheSize){
