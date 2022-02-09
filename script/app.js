@@ -1,7 +1,7 @@
 import Shader from "./Shader.js";
 import VertexBuffer from "./VertexBuffer.js";
-import Matrix3 from "./Utils/Matrix3.js";
-import { resizeDisplay , GetFPS } from "./WebglUtils/WebglUtils.js";
+import { Matrix3 } from "./Utils/MatrixMath.js";
+import { resizeDisplay , getFPS} from "./WebglUtils/WebglUtils.js";
 
 const canvas = document.querySelector("#Canvas")
 const gl = canvas.getContext("webgl2")
@@ -9,51 +9,26 @@ if(!gl){
     console.log("WebGL 2 is unnavaible for you")
 }
 gl.enable(gl.BLEND);
-gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
 //Compile and Shader Stuff
-const vertexShader = `#version 300 es
-
-in vec2 a_position;
-
-uniform vec2 u_resolution;
-uniform mat3 u_matrix;
-
-void main() { 
-    vec2 position = (u_matrix * vec3(a_position, 1)).xy;
-
-    vec2 resolutionGrid = position / u_resolution;
-    resolutionGrid *= 2.0;
-    resolutionGrid -= 1.0;
-
-    gl_Position = vec4( resolutionGrid , 0 , 1);
-}`;
-const fragmentShader = `#version 300 es
- 
-precision highp float;
- 
-out vec4 outColor;
- 
-void main() {
-    outColor = vec4(1, 0, 0, 1);
-}`;
-
-//const shaderSource = [vertexShader,fragmentShader];
 const shaderSource = ["./assets/shaders/VertexShader.glsl","./assets/shaders/FragmentShader.glsl"]
 const shader = new Shader(gl , shaderSource , 10);
 
 // Buffer Stuff
 const vertexBufferObject = new VertexBuffer(gl , gl.ARRAY_BUFFER)
 
-const unit = (canvas.width  / 16);
+resizeDisplay(gl.canvas);
+const unitX = (canvas.width  / 16);
+const unitY = (canvas.height  / 16);
 
 const positions = [
-    0.0,          0.0,
-    3.0*unit,     0.0,
-    0.0,          3.0*unit,
-    0.0,          3.0*unit,
-    3.0*unit,     3.0*unit,
-    3.0*unit,     0.0
+    0.0,            0.0,
+    3.0 * unitX,    0.0,
+    0.0,            3.0 * unitY,
+    0.0,            3.0 * unitY,
+    3.0 * unitX,    3.0 * unitY,
+    3.0 * unitX,    0.0
 ];
 
 vertexBufferObject.addBufferData(gl,
@@ -80,59 +55,38 @@ gl.bindVertexArray(vao);
 
 shader.bind(gl);
 
-//requestAnimationFrame(draw);
-let positionObject = [30 , 30];
+let positionObject = [100 , 100];
 
-let angle = -10%360;
-//1rad × 180/π = 57°
+let angle = 10%360;
+//1rad  = 57° * π / 180
 angle = (angle * Math.PI)/180;
-let rotation = [Math.sin(angle) , Math.cos(angle)];
 
-let scale = [0.85 , 0.85];
+let scale = [1.2 , 1.2];
 
-let then = 0;
-let translationMatrix = Matrix3().translation( positionObject[0] , positionObject[1] );
-let rotationMatrix    = Matrix3().rotation( rotation[0] , rotation[1] );
-let scaleMatrix       = Matrix3().scaling( scale[0] , scale[1] );
-//let matrix = Matrix3().multiply(scaleMatrix, rotationMatrix);
-//matrix = Matrix3().multiply( matrix , translationMatrix);
+requestAnimationFrame(draw);
 
-function draw(){
-    
-    //now *= 0.001;
-    //const deltaTime = now - then
-    //then = now;
-    //const fps  = 1 / deltaTime;
-    
+function draw(now){
     resizeDisplay(gl.canvas);
     gl.viewport( 0 , 0 , gl.canvas.width , gl.canvas.height);
-    gl.clearColor(0 , 0 , 0 , 0);
+    gl.clearColor(0 , 0 , 0 , 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     shader.bind(gl);
     gl.bindVertexArray(vao);
-
-    shader.setUniform2f(gl , "u_resolution" , gl.canvas.width ,  gl.canvas.height);
-    //shader.setUniform2fv(gl , "u_translation" , positionObject)
-    //shader.setUniform2fv(gl , "u_rotation" , rotation);
-    //shader.setUniform2fv(gl , "u_scale", scale);
     
-    let matrix = Matrix3().identity();
+    let matrix = Matrix3.identity();
 
-    for(let i = 0 ; i < 5 ; i++){
-        matrix = Matrix3().multiply( matrix , rotationMatrix);
-        matrix = Matrix3().multiply( matrix , scaleMatrix);
-        matrix = Matrix3().multiply( matrix , translationMatrix);
-        
-        shader.setUniformMat3f(gl , "u_matrix" , matrix);
+    matrix = Matrix3.projection( gl.canvas.clientWidth, gl.canvas.clientHeight);
+    matrix = Matrix3.translate ( matrix , positionObject[0] , positionObject[1] );
+    matrix = Matrix3.rotate    ( matrix , angle );
+    matrix = Matrix3.scale     ( matrix , scale[0] , scale[1] );
+    //matrix = Matrix3.translate ( matrix , -1.5*unitX , -1.5*unitY );
+    
+    shader.setUniformMat3f(gl , "u_matrix" , matrix);
 
-        const primitiveType = gl.TRIANGLES
-        const count = 6
+    const primitiveType = gl.TRIANGLES;
+    const count = 6;
 
-        gl.drawArrays(primitiveType, 0 , count)
-    }
-    //console.log(fps);
-    //requestAnimationFrame(draw);
+    gl.drawArrays(primitiveType, 0 , count);
+    requestAnimationFrame(draw);
 }
-
-draw()
