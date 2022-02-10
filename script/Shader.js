@@ -10,7 +10,11 @@ export default class Shader{
         this.rendererID = createProgram(gl , vertShader , fragShader),
         this.cacheLocation  = new HashTable(cacheSize)
     }
- 
+
+    getProgram(){
+        return this.rendererID;
+    }
+
     setUniform1i(gl , uniformName, value){
         gl.uniform1i(getUniformLocation(gl, this, uniformName), value )
     }
