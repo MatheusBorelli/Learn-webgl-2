@@ -19,8 +19,8 @@ const shader = new Shader(gl , shaderSource , 10);
 const vertexBufferObject = new VertexBuffer(gl , gl.ARRAY_BUFFER)
 
 resizeDisplay(gl.canvas);
-const unitX = (canvas.width  / 16);
-const unitY = (canvas.height  / 16);
+const unitX = (gl.canvas.clientWidth  / 16);
+const unitY = (gl.canvas.clientHeight  / 16);
 
 const positions = [
     0.0,            0.0,
