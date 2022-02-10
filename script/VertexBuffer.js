@@ -5,10 +5,10 @@ export default class VertexBuffer{
     }
 
     bind(gl){
-        gl.bindVertexArray(this.rendererID);
+        gl.bindBuffer(this.rendererID);
     }
     unbind(gl){
-        gl.bindVertexArray(null);
+        gl.bindBuffer(null);
     }
     destructor(){
         delete this;
