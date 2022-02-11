@@ -2,102 +2,108 @@ import Shader from "./Shader.js";
 import VertexBuffer from "./VertexBuffer.js";
 import { Matrix4 } from "./Utils/MatrixMath.js";
 import { resizeDisplay , getFPS} from "./WebglUtils/WebglUtils.js";
+import setGeometry from "./SetGeometry.js";
+import setColors from "./SetColor.js";
 
-const canvas = document.querySelector("#Canvas")
-const gl = canvas.getContext("webgl2")
-if(!gl){
-    console.log("WebGL 2 is unnavaible for you")
-}
-gl.enable(gl.BLEND);
-gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+export function main3D(gl, canvas){
+    gl.enable(gl.BLEND);
+    gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
-//Compile and Shader Stuff
-const shaderSource = ["./assets/shaders/3DVertexShader.glsl","./assets/shaders/3DFragmentShader.glsl"]
-const shader = new Shader(gl , shaderSource , 10);
+    function turnOff3D(){
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.CULL_FACE);
+    }
 
-const maxDepth = 400;
-resizeDisplay(gl.canvas);
-const unitX = (gl.canvas.clientWidth  / 16);
-const unitY = (gl.canvas.clientHeight  / 16);
-const unitZ = maxDepth / 16;
+    //Compile and Shader Stuff
+    const shaderSource = ["./assets/shaders/3DVertexShader.glsl","./assets/shaders/3DFragmentShader.glsl"]
+    const shader = new Shader(gl , shaderSource , 10);
 
-// Buffer Stuff
-const vertexBufferObject = new VertexBuffer(gl , gl.ARRAY_BUFFER)
-
-const positions = [
-    0.0,            0.0,         0,
-    3.0 * unitX,    0.0,         0,
-    0.0,            3.0 * unitY, 0,
-    
-    0.0,            3.0 * unitY, 0,
-    3.0 * unitX,    3.0 * unitY, 0,
-    3.0 * unitX,    0.0,         0
-];
-
-vertexBufferObject.addBufferData(gl,
-     gl.ARRAY_BUFFER,
-     new Float32Array(positions),
-     gl.STATIC_DRAW);
-
-// Vertex Array Object
-const vao = gl.createVertexArray();
-
-gl.bindVertexArray(vao);
-
-gl.enableVertexAttribArray(0);
-
-const size = 3;
-const type = gl.FLOAT;
-const normalize = false;
-const stride = 0;
-const offset = 0;
-gl.vertexAttribPointer(
-    0, size, type, normalize, stride, offset
-);
-gl.bindVertexArray(vao);
-
-shader.bind(gl);
-
-let positionObject = [100 , 100, 0];
-
-let xAngle = 0%360;
-let yAngle = 0%360;
-let zAngle = 0%360;
-//1rad  = 57° * π / 180
-xAngle = (xAngle * Math.PI)/180;
-yAngle = (yAngle * Math.PI)/180;
-zAngle = (zAngle * Math.PI)/180;
-
-let scale = [1 , 1, 0];
-
-//requestAnimationFrame(draw);
-
-function draw(now){
+    const maxDepth = 400;
     resizeDisplay(gl.canvas);
-    gl.viewport( 0 , 0 , gl.canvas.width , gl.canvas.height);
-    gl.clearColor(0 , 0 , 0 , 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // const unitX = (gl.canvas.clientWidth  / 16);
+    // const unitY = (gl.canvas.clientHeight  / 16);
+    // const unitZ = maxDepth / 16;
 
-    shader.bind(gl);
+    // Buffer Creation
+    const positionBuffer = new VertexBuffer(gl, gl.ARRAY_BUFFER);
+    setGeometry(gl);
+
+    // Vertex Array Object for Position
+    const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
-    
-    let matrix = Matrix4.identity();
 
-    matrix = Matrix4.projection ( gl.canvas.clientWidth, gl.canvas.clientHeight, maxDepth);
-    matrix = Matrix4.translate  ( matrix , positionObject[0] , positionObject[1], positionObject[2] );
-    matrix = Matrix4.xRotate    ( matrix , xAngle );
-    matrix = Matrix4.yRotate    ( matrix , yAngle );
-    matrix = Matrix4.zRotate    ( matrix , zAngle );
-    matrix = Matrix4.scale      ( matrix , scale[0] , scale[1] , scale[2]);
-    //matrix = Matrix4.translate  ( matrix , -1.5*unitX , -1.5*unitY, 0 );
-    
-    shader.setUniformMat4f(gl , "u_matrix" , matrix);
+    gl.enableVertexAttribArray(0);
 
-    const primitiveType = gl.TRIANGLES;
-    const count = 6;
+    const size = 3;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
+    gl.vertexAttribPointer(
+        0, size, type, normalize, stride, offset
+    );
 
-    gl.drawArrays(primitiveType, 0 , count);
-    //requestAnimationFrame(draw);
+    //Buffer Creation
+    const colorBuffer = new VertexBuffer(gl ,gl.ARRAY_BUFFER);
+    setColors(gl);
+
+    // Vertex Array Object for Color
+    gl.enableVertexAttribArray(1);
+    gl.vertexAttribPointer(
+        1, 3, gl.UNSIGNED_BYTE, true, 0, 0
+    );
+
+    gl.bindVertexArray(vao);
+    shader.bind(gl);
+
+    let positionObject = [gl.canvas.width/2 , gl.canvas.height/2, 0];
+    let xAngle = 0%360;
+    let yAngle = 30%360;
+    let zAngle = 20%360;
+    //1rad  = 57° * π / 180
+    xAngle = (xAngle * Math.PI)/180;
+    yAngle = (yAngle * Math.PI)/180;
+    zAngle = (zAngle * Math.PI)/180;
+
+    let scale = [ 1, 1, 1];// EM 3D NUNCA ESQUECA ISSO AKI EM 0
+
+    draw();
+
+    function draw(now){
+        resizeDisplay(gl.canvas);
+
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.CULL_FACE);    
+        
+        gl.viewport( 0 , 0 , gl.canvas.width , gl.canvas.height);
+        gl.clearColor(0 , 0 , 0 , 1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        
+        shader.bind(gl);
+        gl.bindVertexArray(vao);
+        
+        let matrix = Matrix4.identity();
+        let left = 0;
+        let right = gl.canvas.clientWidth;
+        let bottom = gl.canvas.clientHeight;
+        let top = 0;
+        let near = maxDepth;
+        let far = (-maxDepth);
+
+        matrix = Matrix4.orthographic( left, right, bottom, top, near, far);
+        matrix = Matrix4.translate   ( matrix , positionObject[0] , positionObject[1], positionObject[2] );
+        matrix = Matrix4.xRotate     ( matrix , xAngle );
+        matrix = Matrix4.yRotate     ( matrix , yAngle );
+        matrix = Matrix4.zRotate     ( matrix , zAngle );
+        matrix = Matrix4.scale       ( matrix , scale[0] , scale[1] , scale[2]);
+        //matrix = Matrix4.translate  ( matrix , -1.5*unitX , -1.5*unitY, 0 );
+        
+        shader.setUniformMat4f(gl , "u_matrix" , matrix);
+
+        const primitiveType = gl.TRIANGLES;
+        const count = 16 * 6;
+
+        gl.drawArrays(primitiveType, 0 , count);
+        turnOff3D();
+    }
 }
-
-draw()

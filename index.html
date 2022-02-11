@@ -13,10 +13,19 @@
             display: block;
             width: 100vw;
             height: 100vh;
+            position: relative;
+            z-index: -1;
+        }
+        div{
+            position: absolute;
         }
     </style>
 </head>
 <body>
+    <div>
+        <button id="2D-btn" type="button">2D</button>
+        <button id="3D-btn" type="button">3D</button>
+    </div>
     <canvas id="Canvas"></canvas>
     <script type="module" src="script/app.js"></script>
 </body>
