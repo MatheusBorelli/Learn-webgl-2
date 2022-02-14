@@ -8,23 +8,37 @@
     <style>
         body{
             margin: 0;
+            background-color: #181a1b;
         }
-        #Canvas{
+        canvas{
             display: block;
             width: 100vw;
             height: 100vh;
             position: relative;
-            z-index: -1;
+            z-index: 1;
         }
         div{
             position: absolute;
+            z-index: 2;
+        }
+        button{
+            text-decoration: none;
+            border-radius: 10%;
+            border-style: none;
+            background-color: gray;
+            color: white;
+            margin: 0.45em 0.45em;
+            padding: 10% 10%;
+        }
+        button:hover{
+            background-color: rgb(172, 171, 171);
         }
     </style>
 </head>
 <body>
     <div>
-        <button id="2D-btn" type="button">2D</button>
-        <button id="3D-btn" type="button">3D</button>
+        <button class="projects-btns" id="2D-btn" type="button">2D</button>
+        <button class="projects-btns" id="3D-btn" type="button">3D</button>
     </div>
     <canvas id="Canvas"></canvas>
     <script type="module" src="script/app.js"></script>

@@ -58,12 +58,11 @@ export function main2D(gl , canvas){
     angle = (angle * Math.PI)/180;
 
     let scale = [1.2 , 1.2];
-    draw();
-
+    
     function draw(now){
         resizeDisplay(gl.canvas);
         gl.viewport( 0 , 0 , gl.canvas.width , gl.canvas.height);
-        gl.clearColor(0 , 0 , 0 , 1);
+        gl.clearColor(0.08, 0.086, 0.09, 1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         shader.bind(gl);
@@ -83,5 +82,9 @@ export function main2D(gl , canvas){
         const count = 6;
 
         gl.drawArrays(primitiveType, 0 , count);
+        requestAnimationFrame(draw);
     }
+    return {
+        draw(now){draw(now)}
+    };
 }

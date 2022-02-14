@@ -76,7 +76,7 @@ export function main3D(gl, canvas){
         gl.enable(gl.CULL_FACE);    
         
         gl.viewport( 0 , 0 , gl.canvas.width , gl.canvas.height);
-        gl.clearColor(0 , 0 , 0 , 1);
+        gl.clearColor(0.08, 0.086, 0.09, 1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
         shader.bind(gl);
@@ -96,7 +96,6 @@ export function main3D(gl, canvas){
         matrix = Matrix4.yRotate     ( matrix , yAngle );
         matrix = Matrix4.zRotate     ( matrix , zAngle );
         matrix = Matrix4.scale       ( matrix , scale[0] , scale[1] , scale[2]);
-        //matrix = Matrix4.translate  ( matrix , -1.5*unitX , -1.5*unitY, 0 );
         
         shader.setUniformMat4f(gl , "u_matrix" , matrix);
 
@@ -105,5 +104,7 @@ export function main3D(gl, canvas){
 
         gl.drawArrays(primitiveType, 0 , count);
         turnOff3D();
+        requestAnimationFrame(draw)
     }
+    return {draw(){draw()}}
 }

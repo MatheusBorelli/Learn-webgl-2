@@ -9,9 +9,10 @@ if(!gl){
 
 const button2D = document.getElementById("2D-btn");
 const button3D = document.getElementById("3D-btn");
+
 button2D.addEventListener("click", () => {
-    main2D(gl, canvas);
+    requestAnimationFrame(main2D(gl, canvas).draw)
 })
 button3D.addEventListener("click", () => {
-    main3D(gl, canvas);
+    requestAnimationFrame(main3D(gl, canvas).draw);
 })
