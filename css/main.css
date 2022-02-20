@@ -1,0 +1,54 @@
+:root{
+    font-size: 70%;
+}
+@media (min-width: 1400px) {
+    :root{
+        font-size: 80%;
+    }
+}
+
+
+body{
+    margin: 0;
+    background-color: #181a1b;
+    font-family: sans-serif;
+}
+#container{
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+#container canvas{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 1;
+}
+
+#container .buttons{
+    position: absolute;
+    display: grid;
+    width: 3.5rem;
+    height: 6.5rem;
+    z-index: 10;
+}
+
+.projects-btns{
+    text-decoration: none;
+    
+    font-size: 1.3rem;
+
+    border-radius: 10%;
+    border-style: none;
+    
+    background-color: gray;
+    color: white;
+    
+    margin: 0.25rem;
+    padding: 1% 1%;
+}
+button:hover{
+    background-color: rgb(172, 171, 171);
+    cursor: pointer;
+}

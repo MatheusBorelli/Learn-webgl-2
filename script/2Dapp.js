@@ -2,8 +2,9 @@ import Shader from "./Shader.js";
 import VertexBuffer from "./VertexBuffer.js";
 import { Matrix3 } from "./Utils/MatrixMath.js";
 import { resizeDisplay , getFPS} from "./WebglUtils/WebglUtils.js";
+import createSliderBar, { destroySlideBar } from "./Utils/SlideBar.js";
 
-export function main2D(gl , canvas){
+export function main2D(gl){
     gl.enable(gl.BLEND);
     gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
@@ -16,7 +17,7 @@ export function main2D(gl , canvas){
 
     resizeDisplay(gl.canvas);
     const unitX = (gl.canvas.clientWidth  / 16);
-    const unitY = (gl.canvas.clientHeight  / 16);
+    const unitY = (gl.canvas.clientHeight / 16);
 
     const positions = [
         0.0,            0.0,
@@ -51,14 +52,73 @@ export function main2D(gl , canvas){
 
     shader.bind(gl);
 
-    let positionObject = [100 , 100];
+    let positionObject = [gl.canvas.clientWidth/2 , gl.canvas.clientHeight/2];
 
     let angle = 10%360;
     //1rad  = 57° * π / 180
-    angle = (angle * Math.PI)/180;
+    function degToRad(degrees){
+        return (degrees * Math.PI)/180;
+    }
 
     let scale = [1.2 , 1.2];
-    
+    {
+        createSliderBar({
+            sliderName: 'X',
+            minVal: 0,
+            maxVal: gl.canvas.clientWidth,
+            defaultVal: positionObject[0],
+            callback: updateTranslation(0)
+        })
+        createSliderBar({
+            sliderName: 'Y',
+            minVal: 0,
+            maxVal: gl.canvas.clientHeight,
+            defaultVal: positionObject[1],
+            callback: updateTranslation(1)
+        })
+        function updateTranslation(index){
+            return function(value){
+                positionObject[index] = value;
+                draw();
+            }
+        }
+        createSliderBar({
+            sliderName: 'Rotation',
+            minVal: -360,
+            maxVal: 360,
+            defaultVal: angle,
+            callback: updateRotation()
+        })
+        function updateRotation(){
+            return function(value){
+                angle = degToRad(value);
+                draw();
+            }
+        }
+        createSliderBar({
+            sliderName: 'scale X',
+            minVal: -5,
+            maxVal: 5,
+            defaultVal: scale[0],
+            callback: updateScale(0),
+            step: 0.001
+        })
+        createSliderBar({
+            sliderName: 'scale Y',
+            minVal: -5,
+            maxVal: 5,
+            defaultVal: scale[1],
+            callback: updateScale(1),
+            step: 0.001
+        })
+        function updateScale(index){
+            return function(value){
+                scale[index] = value;
+                draw();
+            }
+        }
+    }
+
     function draw(now){
         resizeDisplay(gl.canvas);
         gl.viewport( 0 , 0 , gl.canvas.width , gl.canvas.height);
@@ -82,9 +142,10 @@ export function main2D(gl , canvas){
         const count = 6;
 
         gl.drawArrays(primitiveType, 0 , count);
-        requestAnimationFrame(draw);
+        //requestAnimationFrame(draw);
     }
+
     return {
-        draw(now){draw(now)}
+        draw: draw()
     };
 }
