@@ -5,7 +5,7 @@ import { destroySlideBar } from "./Utils/SlideBar.js";
 const canvas = document.querySelector("#Canvas")
 const gl = canvas.getContext("webgl2")
 if(!gl){
-    alert("WebGL 2 is unnavaible for you")
+    alert("Your device doesn't support WebGL 2")
 }
 
 const button2D = document.getElementById("2D-btn");
