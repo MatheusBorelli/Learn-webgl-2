@@ -48,6 +48,7 @@ body{
     margin: 0.25rem;
     padding: 1% 1%;
 }
+
 button:hover{
     background-color: rgb(172, 171, 171);
     cursor: pointer;

@@ -1,4 +1,3 @@
-
 .slider{
     display: flex;
     position: relative;
@@ -24,15 +23,30 @@
     max-width: 30%;
     text-align: right;
 }
+
 .slider input{
     width: 50%
 }
+
 .slider span{
     text-align: center ;
     width: 20%;
     place-items: right;
     font-weight: 600;
 }
+
+@media (max-width: 800px) {
+    .slider{
+        margin-left: 70%;
+    }
+}
+
+@media (max-width: 400px) {
+    .slider{
+        margin-left: 60%;
+    }
+}
+
 .slider-range{    
     -webkit-appearance: none;
     appearance: none;
