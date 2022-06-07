@@ -52,15 +52,18 @@ export function main2D(gl){
 
     shader.bind(gl);
 
-    let positionObject = [gl.canvas.clientWidth/2 , gl.canvas.clientHeight/2];
+    let positionObject = [Math.round(gl.canvas.clientWidth/3) , Math.round(gl.canvas.clientHeight/3)];
 
-    let angle = 10%360;
+    let angle = 0%360;
     //1rad  = 57° * π / 180
     function degToRad(degrees){
         return (degrees * Math.PI)/180;
     }
 
     let scale = [1.2 , 1.2];
+
+    let shear = [0 , 0];
+    //Scope of slider creation
     {
         createSliderBar({
             sliderName: 'X',
@@ -101,7 +104,7 @@ export function main2D(gl){
             maxVal: 5,
             defaultVal: scale[0],
             callback: updateScale(0),
-            step: 0.001
+            step: 0.01
         })
         createSliderBar({
             sliderName: 'scale Y',
@@ -109,11 +112,33 @@ export function main2D(gl){
             maxVal: 5,
             defaultVal: scale[1],
             callback: updateScale(1),
-            step: 0.001
+            step: 0.01
         })
         function updateScale(index){
             return function(value){
                 scale[index] = value;
+                draw();
+            }
+        }
+        createSliderBar({
+            sliderName: 'shearX',
+            minVal: -5,
+            maxVal: 5,
+            defaultVal: shear,
+            callback: updateShear(0),
+            step:0.01
+        })
+        createSliderBar({
+            sliderName: 'shearY',
+            minVal: -5,
+            maxVal: 5,
+            defaultVal: shear,
+            callback: updateShear(1),
+            step:0.01
+        })
+        function updateShear(index){
+            return function(value){
+                shear[index] = value;
                 draw();
             }
         }
@@ -133,8 +158,8 @@ export function main2D(gl){
         matrix = Matrix3.projection(gl.canvas.clientWidth, gl.canvas.clientHeight);
         matrix = Matrix3.translate ( matrix , positionObject[0] , positionObject[1] );
         matrix = Matrix3.rotate    ( matrix , angle );
-        matrix = Matrix3.scale     ( matrix , scale[0] , scale[1] );
-        //matrix = Matrix3.translate ( matrix , -1.5*unitX , -1.5*unitY );
+        matrix = Matrix3.scale     ( matrix , scale[0] , scale[1]);
+        matrix = Matrix3.shear     ( matrix , shear[0] , shear[1]);
         
         shader.setUniformMat3f(gl , "u_matrix" , matrix);
 

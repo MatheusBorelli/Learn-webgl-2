@@ -19,12 +19,9 @@ export function main3D(gl){
     const shaderSource = ["./assets/shaders/3DVertexShader.glsl","./assets/shaders/3DFragmentShader.glsl"]
     const shader = new Shader(gl , shaderSource , 10);
 
-    const maxDepth = 400;
+    const maxDepth = gl.canvas.maxDepth;
     resizeDisplay(gl.canvas);
-    // const unitX = (gl.canvas.clientWidth  / 16);
-    // const unitY = (gl.canvas.clientHeight  / 16);
-    // const unitZ = maxDepth / 16;
-
+    
     // Buffer Creation
     const positionBuffer = new VertexBuffer(gl, gl.ARRAY_BUFFER);
     setGeometry(gl);
@@ -57,28 +54,47 @@ export function main3D(gl){
     gl.bindVertexArray(vao);
     shader.bind(gl);
 
-    let positionObject = [gl.canvas.width/2 , gl.canvas.height/2, 0];
-    let rotation = [ 0%360 , 30%360 , 20%360]
+    /*  
+        Sliders Variables
+    */
+    let positionObject = [0 , 0, -gl.canvas.height];
+    let rotation = [ degToRad(0) , degToRad(0) , degToRad(0)]
     //1rad  = 57° * π / 180
     function degToRad(degAngle){
         return (degAngle * Math.PI)/180
     }
+    function radToDeg(radAngle){
+        return (radAngle * 180)/Math.PI
+    }
 
     let scale = [ 1, 1, 1];// EM 3D NUNCA ESQUECA ISSO AKI EM 0
 
+    let fieldOfViewRad = degToRad(80);
+    
     {
+        //////////////////
+        ///FIELD OF VIEW//
+        //////////////////
+        createSliderBar({ sliderName: 'fieldOfView', minVal: 50, maxVal: 120, defaultVal: radToDeg(fieldOfViewRad), callback: updateFieldOfView() })
+        function updateFieldOfView(){
+            return (value) => {
+                fieldOfViewRad = degToRad(value);
+                draw();
+            } 
+        }
+
         /////////////////
         ///TRANSLATION///
         /////////////////
 
-        createSliderBar({sliderName: 'X',minVal: 0,maxVal: gl.canvas.clientWidth,defaultVal: positionObject[0],callback: updateTranslation(0)})
+        createSliderBar({ sliderName: 'X', minVal: -gl.canvas.clientWidth, maxVal: gl.canvas.clientWidth, defaultVal: positionObject[0], callback: updateTranslation(0) })
 
-        createSliderBar({sliderName: 'Y',minVal: 0,maxVal: gl.canvas.clientHeight,defaultVal: positionObject[1],callback: updateTranslation(1)})
+        createSliderBar({ sliderName: 'Y', minVal: -gl.canvas.clientHeight, maxVal: gl.canvas.clientHeight, defaultVal: positionObject[1], callback: updateTranslation(1) })
 
-        createSliderBar({sliderName: 'Z',minVal: 0,maxVal: gl.canvas.clientHeight,defaultVal: positionObject[2],callback: updateTranslation(2)})
+        createSliderBar({ sliderName: 'Z', minVal: -gl.canvas.clientHeight, maxVal: gl.canvas.clientHeight, defaultVal: positionObject[2], callback: updateTranslation(2) })
 
         function updateTranslation(index) {
-            return function (value) {
+            return (value) => {
                 positionObject[index] = value;
                 draw();
             }
@@ -134,15 +150,21 @@ export function main3D(gl){
         shader.bind(gl);
         gl.bindVertexArray(vao);
 
-        let matrix = Matrix4.identity();
-        let left = 0;
-        let right = gl.canvas.clientWidth;
-        let bottom = gl.canvas.clientHeight;
-        let top = 0;
-        let near = maxDepth;
-        let far = (-maxDepth);
+        // ORTHOGRAPHIC WAY
+        //
+        //let left = 0;
+        //let right = gl.canvas.clientWidth;
+        //let bottom = gl.canvas.clientHeight;
+        //let top = 0;
+        //let near = maxDepth;
+        //let far = (-maxDepth);
+        //matrix = Matrix4.orthographic( left, right, bottom, top, near, far);
+        
+        let aspect = gl.canvas.width/gl.canvas.height;
+        let zNear  = 1
+        let zFar   = 2000
 
-        matrix = Matrix4.orthographic( left, right, bottom, top, near, far);
+        let matrix = Matrix4.perspective (fieldOfViewRad, aspect , zNear , zFar);
         matrix = Matrix4.translate   ( matrix , positionObject[0] , positionObject[1], positionObject[2] );
         matrix = Matrix4.xRotate     ( matrix , rotation[0] );
         matrix = Matrix4.yRotate     ( matrix , rotation[1] );
