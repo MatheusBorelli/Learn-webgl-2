@@ -71,6 +71,7 @@ export function main3D(gl){
 
     let fieldOfViewRad = degToRad(80);
     
+    let shear = [0 , 0 , 0]
     {
         //////////////////
         ///FIELD OF VIEW//
@@ -133,6 +134,23 @@ export function main3D(gl){
                 draw();
             }
         }
+
+        ////////////////
+        /////SHEAR//////
+        ////////////////
+
+        createSliderBar({sliderName: 'shear X',minVal: -5, maxVal: 5, defaultVal: shear[0], callback: updateShear(0),step: 0.1})
+
+        createSliderBar({sliderName: 'shear Y',minVal: -5,maxVal: 5, defaultVal: shear[1],callback: updateShear(1),step: 0.1})
+
+        createSliderBar({sliderName: 'shear Z',minVal: -5,maxVal: 5, defaultVal: shear[2],callback: updateShear(2),step: 0.1})
+
+        function updateShear(index) {
+            return function (value) {
+                shear[index] = value;
+                draw();
+            }
+        }
     }
 
     draw();
@@ -170,6 +188,7 @@ export function main3D(gl){
         matrix = Matrix4.yRotate     ( matrix , rotation[1] );
         matrix = Matrix4.zRotate     ( matrix , rotation[2] );
         matrix = Matrix4.scale       ( matrix , scale[0] , scale[1] , scale[2]);
+        matrix = Matrix4.shear       ( matrix , shear[0] , shear[1] , shear[2]);
 
         shader.setUniformMat4f(gl , "u_matrix" , matrix);
 

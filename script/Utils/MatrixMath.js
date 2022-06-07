@@ -140,6 +140,8 @@ export const Matrix4 = {
     
     scale: (matrix, scaleX, scaleY, scaleZ) => Matrix4.multiply(matrix, Matrix4.scalingMatrix(scaleX, scaleY, scaleZ)),
 
+    shear: (matrix, shearX, shearY, shearZ) => Matrix4.multiply(matrix, Matrix4.shearMatrix(shearX, shearY, shearZ)),
+
     multiply: (a, b) => [
         b[0] * a[0] + b[1] * a[4] + b[2] * a[8] + b[3] * a[12],
         b[0] * a[1] + b[1] * a[5] + b[2] * a[9] + b[3] * a[13],
@@ -207,5 +209,12 @@ export const Matrix4 = {
         0, scaleY, 0, 0,
         0, 0, scaleZ, 0,
         0, 0, 0, 1,
-    ]    
+    ],
+
+    shearMatrix: (shearX, shearY, shearZ) => [
+             1 , shearY ,      0 , 0,
+        shearX ,      1 , shearZ , 0,
+             0 ,      0 ,      1 , 0,
+             0 ,      0 ,      0 , 1
+    ]
 }
